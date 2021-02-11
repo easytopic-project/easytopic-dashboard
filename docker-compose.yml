@@ -1,0 +1,50 @@
+version: "3.3"
+services:
+  dashboard:
+    build: .
+    image: maxjf1/easytopic-dashboard-api:latest
+    # command: npm run dev
+    # volumes:
+    #   - ./:/app
+    depends_on:
+      - rabbitmq
+    ports:
+      - 3000:3000
+    environment:
+      QUEUE_SERVER: "rabbitmq:5672"
+      FILES_PATH: 0
+      FILES_SERVER: 0
+      OCR_INPUT_QUEUE: "ocr-in"
+      OCR_OUTPUT_QUEUE: "ocr-out"
+      FILES_URL: "http://files:3001"
+  files:
+    build: https://github.com/easytopic-project/node-files-microservice.git
+    image: maxjf1/node-files-microservice:latest
+    ports:
+      - 3001:3001
+    volumes:
+      - ./temp/files:/files
+    environment:
+      PORT: 3001
+
+  ocr:
+    build: https://github.com/maxjf1/node-ocr-server.git
+    image: maxjf1/node-ocr-server:latest
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./temp/ocr:/temp
+    environment:
+      QUEUE_SERVER: "rabbitmq:5672"
+      FILES_URL: "http://files:3001"
+      INPUT_QUEUE_NAME: "ocr-in"
+      OUTPUT_QUEUE_NAME: "ocr-out"
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "4369:4369"
+      - "5672:5672"
+      - "25672:25672"
+      - "15672:15672"
+    volumes:
+      - ./temp/rabbitmq:/bitnami

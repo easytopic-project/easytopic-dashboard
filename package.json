@@ -1,0 +1,38 @@
+{
+  "name": "easytopic-dashboard-api",
+  "version": "1.0.0",
+  "description": "Easytopic dashboard that connects to the workers with RabbitMQ and allows control by Rest API",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/easytopic-project/easytopic-dashboard-api.git"
+  },
+  "license": "ISC",
+  "scripts": {
+    "build": "babel src -d dist",
+    "dev": "export FILES_PATH=\"$PWD/temp/files\" && nodemon --exec babel-node src/index.js",
+    "start": "node dist/index.js",
+    "lint": "eslint .",
+    "prettier": "prettier-check \"src/**/*.js\"",
+    "docker": "docker-compose up"
+  },
+  "dependencies": {
+    "amqplib": "^0.5.6",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "node-fetch": "^2.6.0"
+  },
+  "main": "./dist/index.js",
+  "devDependencies": {
+    "@babel/cli": "*",
+    "@babel/core": "*",
+    "@babel/eslint-parser": "^7.12.13",
+    "@babel/node": "*",
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
+    "@babel/preset-env": "*",
+    "eslint": "^7.19.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "nodemon": "*"
+  }
+}

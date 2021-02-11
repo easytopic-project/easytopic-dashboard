@@ -1,0 +1,23 @@
+{
+    "parser": "@babel/eslint-parser",
+    "extends": "airbnb-base",
+    "root": true,
+    "env": {
+        "es6": true,
+        "node": true
+    },
+    "rules": {
+        "consistent-return": "off",
+        "arrow-parens": "off",
+        "no-multi-assign": "off",
+        "no-plusplus": "off",
+        "indent": ["error", 4, { "SwitchCase": 1, "VariableDeclarator": 1 }],
+        // "func-names": "off",
+        // "require-jsdoc": "warn",
+        "valid-jsdoc": ["warn", { "preferType": { "Boolean": "boolean", "Number": "number", "object": "Object", "String": "string" }, "requireReturn": false}],
+        "vars-on-top": "off",
+        // "global-require": "off",
+        "no-shadow": ["error", { "allow": ["err", "callback"]}],
+        "max-len": "off"
+    }
+}
