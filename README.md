@@ -42,10 +42,10 @@ Settings need to be passed as enviroment variables:
 ## Routes
 Arguments need to be send as JSON (`content-type: application/json`).
 
-- `/pipeline/ocr`: Handle OCR actions
-    - GET: Obtain a list of previous OCR actions
-    - POST: Register an new OCR job. The `file` argument with the file url (or an object containing the `name` property) is mandatory.
-- GET `/pipeline/ocr/id`: Gets the status of an OCR job. The response is in the following format (changing the status):
+- GET `/pipeline/options`: returns all pipeline options
+- POST `/pipeline/:type`: Register an new pipeline job. `type` is the pipeline ID, and you need to pass the `input` arguments.
+- GET: `/pipeline`Obtain a list of previous pipeline jobs
+- GET `/pipeline/:id`: Gets the status of an pipeline job. The response is in the following format (changing the status):
 ```json
 {
     "type": "ocr",

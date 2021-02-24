@@ -1,0 +1,57 @@
+{
+    "version": "1.0",
+    "id": "ocr-jpg",
+    "name": "OCR",
+    "description": "Runs OCR on jpg files",
+    "input": [
+        {
+            "id": "image",
+            "name": "Image",
+            "description": "The image from the OCR will be generated",
+            "type": "file",
+            "accept": ".jpg"
+        },
+        {
+            "id": "args",
+            "name": "Arguments",
+            "description": "The arguments will be passed to the OCR worker",
+            "type": "text"
+        }
+    ],
+    "output": [
+        {
+            "id": "ocr",
+            "type": "text",
+            "name": "OCR Result",
+            "description": "The result of the OCR processing"
+        },
+        {
+            "id": "ocr-duplicate",
+            "type": "text",
+            "name": "OCR duplicate",
+            "description": "Just a duplicate result of the OCR"
+        }
+    ],
+    "pipeline": [
+        {
+            "id": "ocr-service",
+            "queues": [
+                {
+                    "env": "OCR_INPUT_QUEUE",
+                    "default": "ocr-in"
+                },
+                {
+                    "env": "OCR_OUTPUT_QUEUE",
+                    "default": "ocr-out"
+                }
+            ],
+            "arguments": {
+                "file": "image"
+            },
+            "output": {
+                "ocr": "ocr",
+                "ocr-duplicate": "ocr"
+            }
+        }
+    ]
+}

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import LocalDatabase from '../lib/LocalDatabase';
 import { getChannel, queues } from '../lib/queueConnection';
+import pipelines from '../pipelines';
 
 const pipelineRouter = new Router();
 /**
@@ -28,6 +29,10 @@ pipelineRouter.post('/ocr', async ({ body: { file } }, res) => {
     listenOutputs();
     res.send(item);
 });
+
+pipelineRouter.get('/options', (req, res) => res.send(
+    pipelines.map(({ pipeline, ...info }) => info),
+));
 
 pipelineRouter.get('/:id', ({ params: { id } }, res) => res
     .send(LocalDatabase.getItem(id) || 404));

@@ -1,0 +1,46 @@
+{
+    "version": "1.0",
+    "id": "ocr",
+    "name": "OCR",
+    "description": "Runs OCR on an image files",
+    "input": [
+        {
+            "id": "image",
+            "name": "Image",
+            "description": "The image from the OCR will be generated",
+            "type": "file",
+            "accept": [
+                "image/*"
+            ]
+        }
+    ],
+    "output": [
+        {
+            "id": "ocr",
+            "type": "text",
+            "name": "OCR Result",
+            "description": "The result of the OCR processing"
+        }
+    ],
+    "pipeline": [
+        {
+            "id": "ocr-service",
+            "queues": [
+                {
+                    "env": "OCR_INPUT_QUEUE",
+                    "default": "ocr-in"
+                },
+                {
+                    "env": "OCR_OUTPUT_QUEUE",
+                    "default": "ocr-out"
+                }
+            ],
+            "arguments": {
+                "file": "image"
+            },
+            "output": [
+                "ocr"
+            ]
+        }
+    ]
+}

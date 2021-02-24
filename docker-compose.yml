@@ -3,9 +3,9 @@ services:
   dashboard:
     build: .
     image: maxjf1/easytopic-dashboard-api:latest
-    # command: npm run dev
-    # volumes:
-    #   - ./:/app
+    command: npm run dev
+    volumes:
+      - ./:/app
     depends_on:
       - rabbitmq
     ports:
