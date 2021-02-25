@@ -9,6 +9,7 @@
             "name": "Image",
             "description": "The image from the OCR will be generated",
             "type": "file",
+            "required": true,
             "accept": ".jpg"
         },
         {
@@ -32,26 +33,18 @@
             "description": "Just a duplicate result of the OCR"
         }
     ],
-    "pipeline": [
-        {
-            "id": "ocr-service",
-            "queues": [
-                {
-                    "env": "OCR_INPUT_QUEUE",
-                    "default": "ocr-in"
-                },
-                {
-                    "env": "OCR_OUTPUT_QUEUE",
-                    "default": "ocr-out"
-                }
-            ],
-            "arguments": {
-                "file": "image"
-            },
-            "output": {
-                "ocr": "ocr",
-                "ocr-duplicate": "ocr"
-            }
+    "pipeline": {
+        "id": "ocr-service",
+        "queues": [
+            "ocr-in-test",
+            "ocr-out-test"
+        ],
+        "arguments": {
+            "file": "image"
+        },
+        "output": {
+            "ocr": "ocr",
+            "ocr-duplicate": "ocr"
         }
-    ]
+    }
 }

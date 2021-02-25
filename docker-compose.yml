@@ -9,12 +9,12 @@ services:
     depends_on:
       - rabbitmq
     ports:
-      - 3000:3000
+      - 8080:3000
     environment:
       QUEUE_SERVER: "rabbitmq:5672"
       OCR_INPUT_QUEUE: "ocr-in"
       OCR_OUTPUT_QUEUE: "ocr-out"
-      FILES_SERVER: "http://files:3001"
+      FILES_SERVER: "files:3001"
   files:
     build: https://github.com/easytopic-project/node-files-microservice.git
     image: maxjf1/node-files-microservice:latest
@@ -34,9 +34,22 @@ services:
       - ./temp/ocr:/temp
     environment:
       QUEUE_SERVER: "rabbitmq:5672"
-      FILES_SERVER: "http://files:3001"
+      FILES_SERVER: "files:3001"
       INPUT_QUEUE_NAME: "ocr-in"
       OUTPUT_QUEUE_NAME: "ocr-out"
+  ocr-test:
+    build: https://github.com/maxjf1/node-ocr-server.git
+    image: maxjf1/node-ocr-server:latest
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./temp/ocr-test:/temp
+    environment:
+      QUEUE_SERVER: "rabbitmq:5672"
+      FILES_SERVER: "files:3001"
+      INPUT_QUEUE_NAME: "ocr-in-test"
+      OUTPUT_QUEUE_NAME: "ocr-out-test"
+      
   rabbitmq:
     image: rabbitmq:3-management
     ports:

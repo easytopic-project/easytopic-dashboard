@@ -17,7 +17,7 @@
         "valid-jsdoc": ["warn", { "preferType": { "Boolean": "boolean", "Number": "number", "object": "Object", "String": "string" }, "requireReturn": false}],
         "vars-on-top": "off",
         // "global-require": "off",
-        "no-shadow": ["error", { "allow": ["err", "callback"]}],
+        "no-shadow": ["warn", { "hoist": "never", "allow": ["err", "callback"]}],
         "max-len": "off"
     }
 }

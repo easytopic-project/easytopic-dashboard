@@ -9,6 +9,7 @@
             "name": "Image",
             "description": "The image from the OCR will be generated",
             "type": "file",
+            "required": true,
             "accept": [
                 "image/*"
             ]
@@ -22,25 +23,23 @@
             "description": "The result of the OCR processing"
         }
     ],
-    "pipeline": [
-        {
-            "id": "ocr-service",
-            "queues": [
-                {
-                    "env": "OCR_INPUT_QUEUE",
-                    "default": "ocr-in"
-                },
-                {
-                    "env": "OCR_OUTPUT_QUEUE",
-                    "default": "ocr-out"
-                }
-            ],
-            "arguments": {
-                "file": "image"
+    "pipeline": {
+        "id": "ocr-service",
+        "queues": [
+            {
+                "env": "OCR_INPUT_QUEUE",
+                "default": "ocr-in"
             },
-            "output": [
-                "ocr"
-            ]
-        }
-    ]
+            {
+                "env": "OCR_OUTPUT_QUEUE",
+                "default": "ocr-out"
+            }
+        ],
+        "arguments": {
+            "file": "image"
+        },
+        "output": [
+            "ocr"
+        ]
+    }
 }

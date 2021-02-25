@@ -36,3 +36,8 @@ export const getChannel = () => new Promise(resolve => {
     listeners.push(resolve);
     generateConnection();
 });
+
+export const getQueue = config => (
+    typeof config === 'string' ? config
+        : (config.env && process.env[config.env]) || config.default
+);

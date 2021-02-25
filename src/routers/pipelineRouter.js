@@ -1,33 +1,61 @@
 import { Router } from 'express';
 import LocalDatabase from '../lib/LocalDatabase';
-import { getChannel, queues } from '../lib/queueConnection';
+import { getChannel, getQueue } from '../lib/queueConnection';
 import pipelines from '../pipelines';
 
 const pipelineRouter = new Router();
-/**
- * @type {import('amqplib').Channel}
- */
-let channel = null;
 
-async function listenOutputs() {
-    if (channel !== null) return;
-    channel = await getChannel();
-    Object.values(queues).forEach(([_, outQueue]) => channel.consume(outQueue, msg => {
-        const response = JSON.parse(msg.content.toString());
-        LocalDatabase.updateItem(response.id, { status: 'done', response });
-        channel.ack(msg);
-    }));
-}
+pipelines.forEach(({
+    pipeline, id, version, input,
+}) => {
+    /**
+     * @type {import('amqplib').Channel}
+     */
+    let channel = null;
+    // TODO: Support multiple-step pipelines
+    const inputQueue = getQueue(pipeline.queues[0]);
+    const outputQueue = getQueue(pipeline.queues[1]);
 
-pipelineRouter.post('/ocr', async ({ body: { file } }, res) => {
-    if (!file) return res.send(400);
-    const ch = await getChannel();
-    let item = LocalDatabase.postItem({ type: 'ocr', status: 'waiting' });
-    const data = { file, id: item.id };
-    ch.sendToQueue(queues.ocr[0], Buffer.from(JSON.stringify(data)));
-    item = LocalDatabase.updateItem(item.id, { data });
-    listenOutputs();
-    res.send(item);
+    async function listenOutput() {
+        if (channel !== null) return;
+        channel = await getChannel();
+        let { output: pipelineOut } = pipeline;
+
+        if (pipelineOut instanceof Array) {
+            pipelineOut = pipelineOut.reduce((out, field) => ({ ...out, [field]: field }), {});
+        }
+
+        channel.consume(outputQueue, msg => {
+            const response = JSON.parse(msg.content.toString());
+            const output = Object
+                .entries(pipelineOut)
+                .reduce(
+                    (out, [field, value]) => ({ ...out, [field]: response[value] }),
+                    {},
+                );
+
+            LocalDatabase.updateItem(response.id, { status: 'done', response, output });
+            channel.ack(msg);
+        });
+    }
+
+    pipelineRouter.post(`/${id}`, async ({ body }, res) => {
+        // TODO: Generate validation function
+        const missing = input.find(field => !body[field.id]);
+        if (missing) return res.status(400).send(`field ${missing.id} is required`);
+
+        const ch = await getChannel();
+        let item = LocalDatabase.postItem({ type: id, version, status: 'waiting' });
+        const data = Object.entries(pipeline.arguments).reduce(
+            (data, [field, value]) => ({ ...data, [field]: body[value] }),
+            { id: item.id },
+        );
+
+        ch.sendToQueue(inputQueue, Buffer.from(JSON.stringify(data)));
+        item = LocalDatabase.updateItem(item.id, { input: data });
+        listenOutput();
+        res.send(item);
+    });
 });
 
 pipelineRouter.get('/options', (req, res) => res.send(
