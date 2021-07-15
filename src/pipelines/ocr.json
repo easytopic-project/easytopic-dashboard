@@ -1,76 +1,76 @@
 {
-    "version": "1.0",
-    "id": "ocr",
-    "name": "OCR",
-    "description": "Runs OCR on an image files",
-    "input": [
-        {
-            "id": "image",
-            "name": "Image",
-            "description": "The image from the OCR will be generated",
-            "type": "file",
-            "required": true,
-            "accept": [
-                "image/*"
-            ]
-        },
-        {
-            "id": "language",
-            "name": "Language",
-            "description": "The language",
-            "type": "select",
-            "options": {
-                "eng": "English",
-                "ptbr": "Brazilian portugueze"
-            },
-            "required": true
-        }
-    ],
-    "output": [
-        {
-            "id": "ocr",
-            "from": "ocr-service:ocr",
-            "type": "text",
-            "name": "OCR Result",
-            "description": "The result of the OCR processing"
-        }
-    ],
-    "jobs": [{
-        "id": "ocr-service",
-        "queues": [
-            {
-                "env": "OCR_INPUT_QUEUE",
-                "default": "ocr-in"
-            },
-            {
-                "env": "OCR_OUTPUT_QUEUE",
-                "default": "ocr-out"
-            }
-        ],
-        "arguments": {
-            "file": "image"
-        },
-        "output": [
-            "ocr"
-        ]
+  "version": "1.0",
+  "id": "ocr",
+  "name": "OCR",
+  "description": "Runs OCR on an image files",
+  "input": [
+    {
+      "id": "image",
+      "name": "Image",
+      "description": "The image from the OCR will be generated",
+      "type": "file",
+      "required": true,
+      "accept": ["image/*"]
     },
     {
-        "id": "ocr-service-copy",
-        "queues": [
-            {
-                "env": "OCR_INPUT_QUEUE",
-                "default": "ocr-in"
-            },
-            {
-                "env": "OCR_OUTPUT_QUEUE",
-                "default": "ocr-out"
-            }
-        ],
-        "arguments": {
-            "file": "image"
+      "id": "image-alt",
+      "name": "Image Alt",
+      "description": "Second  image from the OCR will be generated",
+      "type": "file",
+      "required": true,
+      "accept": ["image/*"]
+    },
+    {
+      "id": "language",
+      "name": "Language",
+      "description": "The language",
+      "type": "select",
+      "options": {"eng": "English", "ptbr": "Brazilian portugueze"},
+      "required": true
+    }
+  ],
+  "output": [
+    {
+      "id": "ocr",
+      "from": "ocr-service:ocr",
+      "type": "text",
+      "name": "OCR Result",
+      "description": "The result of the OCR processing"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "ocr-aggregation",
+      "type": "aggregation",
+      "jobs": [
+        {
+          "id": "ocr-service",
+          "queues": [
+            {"env": "OCR_INPUT_QUEUE", "default": "ocr-in"},
+            {"env": "OCR_OUTPUT_QUEUE", "default": "ocr-out"}
+          ],
+          "arguments": {"file": "image"},
+          "output": ["ocr"]
         },
-        "output": [
-            "ocr"
-        ]
-    }]
+        {
+          "id": "ocr-service-copy",
+          "queues": [
+            {"env": "OCR_INPUT_QUEUE", "default": "ocr-in"},
+            {"env": "OCR_OUTPUT_QUEUE", "default": "ocr-out"}
+          ],
+          "arguments": {"file": "image-alt"},
+          "output": ["ocr"]
+        }
+      ]
+    },
+    {
+      "id": "ocr-final",
+      "queues": [
+        {"env": "OCR_INPUT_QUEUE", "default": "ocr-in"},
+        {"env": "OCR_OUTPUT_QUEUE", "default": "ocr-out"}
+      ],
+      "arguments": {"file": "image"},
+      "output": ["ocr"]
+    }
+  ]
 }

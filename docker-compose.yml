@@ -58,4 +58,4 @@ services:
       - "25672:25672"
       - "15672:15672"
     volumes:
-      - ./temp/rabbitmq:/bitnami
+      - ./temp/rabbitmq:/var/lib/rabbitmq/mnesia/

@@ -14,12 +14,16 @@ const pipelineRouter = new Router();
  * @param {Object} job the pipeline job object
  * @param {(Step | Number)} [step] the current step oject or index. default to first step
  */
-async function startProccessing({
-    type, input, data: jobData, id,
-}, step) {
+async function startProccessing(job, step) {
+    const {
+        type, input, data: jobData, id,
+    } = job;
     const pipeline = pipelineOptions[type];
     if (!step) step = 0;
     if (typeof step === 'number') step = pipeline.jobs[step];
+
+    if (step.type === 'aggregation') return step.jobs.forEach(s => startProccessing(job, s));
+
     const queue = getQueue(step.queues[0]);
     const data = Object.entries(step.arguments).reduce(
         (data, [field, value]) => {
@@ -48,23 +52,33 @@ async function listenQueue(queue) {
         /** @type {Object} the current item */
         const item = LocalDatabase.getItem(id);
         const pipeline = pipelines.find(p => p.id === item.type);
-        const jobIndex = pipeline.jobs.findIndex(j => j.id === jobId);
+        const jobIndex = pipeline.jobs.findIndex(j => {
+            if (j.type === 'aggregation') {
+                return j.jobs.find(s => s.id === jobId);
+            }
+            return j.id === jobId;
+        });
         /** @type {Object} the current job */
-        const job = pipeline.jobs[jobIndex];
+        let job = pipeline.jobs[jobIndex];
+        const aggregation = job.id !== jobId;
+        if (aggregation) job = job.jobs.find(j => j.id === jobId);
 
         const output = Object
             .entries(job.output)
             .reduce((out, [field, value]) => ({ ...out, [field]: response[value] }), {});
         item.data[jobId] = output;
-        if (jobIndex === pipeline.jobs.length - 1) item.status = 'done';
         LocalDatabase.updateItem(id, item);
-
-        if (pipeline.jobs[jobIndex + 1]) startProccessing(item, jobIndex + 1);
+        if (!aggregation || pipeline.jobs[jobIndex].jobs.every(j => item.data[j.id])) {
+            if (jobIndex === pipeline.jobs.length - 1) LocalDatabase.updateItem(id, { status: 'done' });
+            if (pipeline.jobs[jobIndex + 1]) startProccessing(item, jobIndex + 1);
+        }
         ch.ack(msg);
     });
 }
 
-pipelines.forEach(pipeline => pipeline.jobs.forEach(async job => listenQueue(job.queues[1])));
+pipelines.forEach(pipeline => pipeline.jobs
+    .reduce((jobs, j) => jobs.concat(j.jobs || j), []) // Concat aggregation steps
+    .forEach(async job => listenQueue(job.queues[1])));
 
 pipelineRouter.post('/:id', async ({ body: input, params }, res) => {
     const pipeline = pipelineOptions[params.id];

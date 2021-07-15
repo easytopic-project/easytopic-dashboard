@@ -1,50 +1,44 @@
 {
-    "version": "1.0",
-    "id": "ocr-jpg",
-    "name": "OCR",
-    "description": "Runs OCR on jpg files",
-    "input": [
-        {
-            "id": "test_2",
-            "name": "Image",
-            "description": "The image from the OCR will be generated",
-            "type": "file",
-            "required": true,
-            "accept": ".jpg"
-        },
-        {
-            "id": "args",
-            "name": "Arguments",
-            "description": "The arguments will be passed to the OCR worker",
-            "type": "text"
-        }
-    ],
-    "output": [
-        {
-            "id": "saida",
-            "type": "text",
-            "name": "OCR Result",
-            "description": "The result of the OCR processing"
-        },
-        {
-            "id": "ocr-duplicate",
-            "type": "text",
-            "name": "OCR duplicate",
-            "description": "Just a duplicate result of the OCR"
-        }
-    ],
-    "jobs": [{
-        "id": "ocr-service",
-        "queues": [
-            "ocr-in-test",
-            "ocr-out-test"
-        ],
-        "arguments": {
-            "file": "test_2"
-        },
-        "output": {
-            "saida": "ocr",
-            "ocr-duplicate": "ocr"
-        }
-    }]
+  "version": "1.0",
+  "id": "ocr-jpg",
+  "name": "OCR",
+  "description": "Runs OCR on jpg files",
+  "input": [
+    {
+      "id": "test_2",
+      "name": "Image",
+      "description": "The image from the OCR will be generated",
+      "type": "file",
+      "required": true,
+      "accept": ".jpg"
+    },
+    {
+      "id": "args",
+      "name": "Arguments",
+      "description": "The arguments will be passed to the OCR worker",
+      "type": "text"
+    }
+  ],
+  "output": [
+    {
+      "id": "saida",
+      "type": "text",
+      "name": "OCR Result",
+      "description": "The result of the OCR processing"
+    },
+    {
+      "id": "ocr-duplicate",
+      "type": "text",
+      "name": "OCR duplicate",
+      "description": "Just a duplicate result of the OCR"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "ocr-service",
+      "queues": ["ocr-in-test", "ocr-out-test"],
+      "arguments": {"file": "test_2"},
+      "output": {"saida": "ocr", "ocr-duplicate": "ocr"}
+    }
+  ]
 }

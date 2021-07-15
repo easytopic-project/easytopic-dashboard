@@ -16,15 +16,22 @@ const listeners = [];
 export async function generateConnection() {
     if (connection !== null) return;
     connection = channel = false;
-    connection = await amqp.connect(`amqp://${QUEUE_SERVER}`);
-    channel = await connection.createChannel();
-    await Promise.all(Object
-        .values(queues)
-        .flat()
-        .map(
-            (query) => channel.assertQueue(query, { durable: true }),
-        ));
-    listeners.forEach((cb) => cb(channel));
+    try {
+        connection = await amqp.connect(`amqp://${QUEUE_SERVER}`);
+        channel = await connection.createChannel();
+        await Promise.all(Object
+            .values(queues)
+            .flat()
+            .map(
+                (query) => channel.assertQueue(query, { durable: true }),
+            ));
+        listeners.forEach((cb) => cb(channel));
+        console.log('connected to amqp server.');
+    } catch (err) {
+        connection = channel = null;
+        console.warn(`connection to amqp://${QUEUE_SERVER} failed. retrying in 3 seconds...`);
+        setTimeout(generateConnection, 3000);
+    }
 }
 
 /**
