@@ -5,7 +5,7 @@
     "description": "Runs OCR on jpg files",
     "input": [
         {
-            "id": "image",
+            "id": "test_2",
             "name": "Image",
             "description": "The image from the OCR will be generated",
             "type": "file",
@@ -21,7 +21,7 @@
     ],
     "output": [
         {
-            "id": "ocr",
+            "id": "saida",
             "type": "text",
             "name": "OCR Result",
             "description": "The result of the OCR processing"
@@ -33,18 +33,18 @@
             "description": "Just a duplicate result of the OCR"
         }
     ],
-    "pipeline": {
+    "jobs": [{
         "id": "ocr-service",
         "queues": [
             "ocr-in-test",
             "ocr-out-test"
         ],
         "arguments": {
-            "file": "image"
+            "file": "test_2"
         },
         "output": {
-            "ocr": "ocr",
+            "saida": "ocr",
             "ocr-duplicate": "ocr"
         }
-    }
+    }]
 }

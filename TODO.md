@@ -11,3 +11,5 @@ Here is a list of future imrpovements for the project. Feel free to add a new on
 - [ ] New communication formats besides AMQP (API REST for instance)
 - [ ] Test pipeline (with all available fields)
 - [ ] web push notification support
+- [ ] Dynamic pipelines loading
+- [ ] Routes error handler (code, etc)

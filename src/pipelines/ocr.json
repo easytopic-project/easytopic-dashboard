@@ -13,17 +13,29 @@
             "accept": [
                 "image/*"
             ]
+        },
+        {
+            "id": "language",
+            "name": "Language",
+            "description": "The language",
+            "type": "select",
+            "options": {
+                "eng": "English",
+                "ptbr": "Brazilian portugueze"
+            },
+            "required": true
         }
     ],
     "output": [
         {
             "id": "ocr",
+            "from": "ocr-service:ocr",
             "type": "text",
             "name": "OCR Result",
             "description": "The result of the OCR processing"
         }
     ],
-    "pipeline": {
+    "jobs": [{
         "id": "ocr-service",
         "queues": [
             {
@@ -41,5 +53,24 @@
         "output": [
             "ocr"
         ]
-    }
+    },
+    {
+        "id": "ocr-service-copy",
+        "queues": [
+            {
+                "env": "OCR_INPUT_QUEUE",
+                "default": "ocr-in"
+            },
+            {
+                "env": "OCR_OUTPUT_QUEUE",
+                "default": "ocr-out"
+            }
+        ],
+        "arguments": {
+            "file": "image"
+        },
+        "output": [
+            "ocr"
+        ]
+    }]
 }

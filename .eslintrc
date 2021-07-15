@@ -8,6 +8,7 @@
     },
     "rules": {
         "consistent-return": "off",
+        "no-param-reassign": "off",
         "arrow-parens": "off",
         "no-multi-assign": "off",
         "no-plusplus": "off",

@@ -49,7 +49,7 @@ services:
       FILES_SERVER: "files:3001"
       INPUT_QUEUE_NAME: "ocr-in-test"
       OUTPUT_QUEUE_NAME: "ocr-out-test"
-      
+
   rabbitmq:
     image: rabbitmq:3-management
     ports:
