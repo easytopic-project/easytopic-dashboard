@@ -16,11 +16,13 @@ const pipelineRouter = new Router();
  */
 async function startProccessing(job, step) {
     const {
-        type, input, data: jobData, id,
+        type, input, data: jobData, id, jobStatus,
     } = job;
     const pipeline = pipelineOptions[type];
     if (!step) step = 0;
     if (typeof step === 'number') step = pipeline.jobs[step];
+    jobStatus[step.id].startAt = new Date();
+    LocalDatabase.updateItem(id, { jobStatus });
 
     if (step.type === 'aggregation') return step.jobs.forEach(s => startProccessing(job, s));
 
@@ -67,10 +69,16 @@ async function listenQueue(queue) {
             .entries(job.output)
             .reduce((out, [field, value]) => ({ ...out, [field]: response[value] }), {});
         item.data[jobId] = output;
+        item.jobStatus[jobId].finishAt = new Date();
         LocalDatabase.updateItem(id, item);
         if (!aggregation || pipeline.jobs[jobIndex].jobs.every(j => item.data[j.id])) {
-            if (jobIndex === pipeline.jobs.length - 1) LocalDatabase.updateItem(id, { status: 'done' });
+            if (aggregation) item.jobStatus[pipeline.jobs[jobIndex].id].finishAt = new Date();
+            if (jobIndex === pipeline.jobs.length - 1) {
+                item.status = 'done';
+                item.finishAt = new Date();
+            }
             if (pipeline.jobs[jobIndex + 1]) startProccessing(item, jobIndex + 1);
+            LocalDatabase.updateItem(id, item);
         }
         ch.ack(msg);
     });
@@ -88,7 +96,17 @@ pipelineRouter.post('/:id', async ({ body: input, params }, res) => {
     if (missing) return res.status(400).send(`field ${missing.id} is required`);
 
     const job = LocalDatabase.postItem({
-        type: pipeline.id, input, output: null, version: pipeline.version, status: 'waiting', data: {},
+        type: pipeline.id,
+        input,
+        output: null,
+        version: pipeline.version,
+        status: 'waiting',
+        data: {},
+        createdAt: new Date(),
+        finishAt: null,
+        jobStatus: pipeline.jobs
+            .reduce((jobs, j) => jobs.concat(j.jobs ? [...j.jobs, j] : j), [])
+            .reduce((status, j) => ({ ...status, [j.id]: { startAt: null, finishAt: null } }), {}),
     });
 
     await startProccessing(job);
