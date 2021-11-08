@@ -1,0 +1,106 @@
+{
+  "version": "1.0",
+  "id": "Easytopic",
+  "name": "Easytopic original pipeline",
+  "description": "Runs all Easytopic's modules",
+  "input": [
+    {
+      "id": "video",
+      "name": "Video",
+      "description": "Video to go trough modules",
+      "type": "file",
+      "required": true,
+      "accept": ["video/mp4"]
+    }
+  ],
+  "output": [
+    {
+      "id": "ae",
+      "from": "audio-extractor:audio",
+      "type": "file",
+      "name": "Audio Extractor Result",
+      "description": "The result of the Audio Extractor processing"
+    },
+    {
+      "id": "vad",
+      "from": "vad:vad-output",
+      "type": "file",
+      "name": "Voice Activity Detector Result",
+      "description": "The result of the Voice Activity Detector processing"
+    },
+    {
+      "id": "asr",
+      "from": "asr:asr",
+      "type": "file",
+      "name": "ASR Result",
+      "description": "The result of the ASR processing"
+    },
+    {
+      "id": "llf",
+      "from": "llf:low-level-output",
+      "type": "file",
+      "name": "Low Level Features Result",
+      "description": "The result of the Low Level Features processing"
+    },
+    {
+      "id": "topic-segmentation",
+      "from": "ts:topic-segmentation-output",
+      "type": "file",
+      "name": "Topic Segmentation Result",
+      "description": "The result of the Topic Segmentation processing"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "audio-extractor",
+      "queues": [
+        { "env": "A_E_INPUT_QUEUE", "default": "audio_extractor_in" },
+        { "env": "A_E_OUTPUT_QUEUE", "default": "audio_extractor_out" }
+      ],
+      "arguments": { "file": "video" },
+      "output": ["audio"]
+    },
+    {
+      "id": "vad",
+      "queues": [
+        { "env": "VAD_INPUT_QUEUE", "default": "vad_in" },
+        { "env": "VAD_OUTPUT_QUEUE", "default": "vad_out" }
+      ],
+      "arguments": { "file": "audio-extractor:audio" },
+      "output": ["vad-output"]
+    },
+    {
+      "id": "aggregation",
+      "type": "aggregation",
+      "jobs": [
+        {
+          "id": "asr",
+          "queues": [
+            { "env": "ASR_INPUT_QUEUE", "default": "asr_in" },
+            { "env": "ASR_OUTPUT_QUEUE", "default": "asr_out" }
+          ],
+          "arguments": { "file": "vad:vad-output" },
+          "output": ["asr"]
+        },
+        {
+          "id": "llf",
+          "queues": [
+            { "env": "LLF_INPUT_QUEUE", "default": "low_level_in" },
+            { "env": "LLF_OUTPUT_QUEUE", "default": "low_level_out" }
+          ],
+          "arguments": { "file": "vad:vad-output" },
+          "output": ["low-level-output"]
+        }
+      ]
+    },
+    {
+      "id": "topic-segmentation",
+      "queues": [
+        { "env": "TS_INPUT_QUEUE", "default": "topic_segmentation_in" },
+        { "env": "TS_OUTPUT_QUEUE", "default": "topic_segmentation_out" }
+      ],
+      "arguments": { "asr": "asr:0", "llf": "llf:0" },
+      "output": ["topic-segmentation-output"]
+    }
+  ]
+}
