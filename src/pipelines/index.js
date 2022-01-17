@@ -1,6 +1,5 @@
 import ocr from './ocr.json';
 import ocrTest from './ocrTest.json';
-import audio_extractor_pipeline from './audio_extractor_pipeline.json';
 import easytopic from './easytopic.json';
 
 const pipelines = [

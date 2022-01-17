@@ -12,5 +12,6 @@ export const {
     LLF_INPUT_QUEUE = 'low_level_in',
     LLF_OUTPUT_QUEUE = 'low_level_out',
     TS_INPUT_QUEUE = 'topic_segmentation_in',
-    TS_OUTPUT_QUEUE = 'topic_segmentation_out'
+    TS_OUTPUT_QUEUE = 'topic_segmentation_out',
+    RMQ_API = '',
 } = process.env;

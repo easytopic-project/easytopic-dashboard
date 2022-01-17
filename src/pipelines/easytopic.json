@@ -44,7 +44,7 @@
     },
     {
       "id": "topic-segmentation",
-      "from": "ts:topic-segmentation-output",
+      "from": "topic-segmentation:topic-segmentation-output",
       "type": "file",
       "name": "Topic Segmentation Result",
       "description": "The result of the Topic Segmentation processing"

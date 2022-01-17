@@ -49,6 +49,7 @@ async function startProccessing(job, step) {
  */
 async function listenQueue(queue) {
     const ch = await getChannel();
+    ch.assertQueue(getQueue(queue), { durable: true });
     ch.consume(getQueue(queue), msg => {
         const { id, job: jobId, ...response } = JSON.parse(msg.content.toString());
         /** @type {Object} the current item */
