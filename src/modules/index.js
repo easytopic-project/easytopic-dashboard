@@ -10,26 +10,12 @@ modules.push({
   output_queue: "ocr-out",
   input: [
     {
-      id: "image",
+      id: "file",
       link: true,
       type: "file",
       required: true,
       accept: ["image/*"],
-    },
-    {
-      id: "image-alt",
-      link: true,
-      type: "file",
-      required: true,
-      accept: ["image/*"],
-    },
-    {
-        id: "language",
-        link: false,
-        type: "select",
-        required: true,
-        options: {"eng": "English", "ptbr": "Brazilian portugueze"},
-      },
+    }
   ],
   output: [
     {
@@ -50,26 +36,12 @@ modules.push({
     output_queue: "ocr-out-test",
     input: [
       {
-        id: "image",
+        id: "file",
         link: true,
         type: "file",
         required: true,
         accept: ["image/*"],
-      },
-      {
-        id: "image-alt",
-        link: true,
-        type: "file",
-        required: true,
-        accept: ["image/*"],
-      },
-      {
-          id: "language",
-          link: false,
-          type: "select",
-          required: true,
-          options: {"eng": "English", "ptbr": "Brazilian portugueze"},
-        },
+      }
     ],
     output: [
       {
