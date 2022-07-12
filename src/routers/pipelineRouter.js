@@ -93,10 +93,20 @@ async function listenQueue(queue) {
 }
 
 pipelines.forEach((pipeline) =>
-  pipeline.jobs
-    .reduce((jobs, j) => jobs.concat(j.jobs || j), []) // Concat aggregation steps
-    .forEach(async (job) => listenQueue(job.queues[1]))
+pipeline.jobs
+.reduce((jobs, j) => jobs.concat(j.jobs || j), []) // Concat aggregation steps
+.forEach(async (job) => listenQueue(job.queues[1]))
 );
+
+pipelineRouter.post("/new", async ({ body: pipeline }, res) => {
+
+  if (!pipeline) return res.status(404).send("no pipeline sent");
+  if (!pipeline.id) return res.status(404).send("missing pipeline id");
+
+  pipelines.push(pipeline);
+  pipelineOptions[pipeline.id] = pipeline;
+  res.send(`pipeline of id '${pipeline.id}' created`);
+});
 
 pipelineRouter.post("/:id", async ({ body: input, params }, res) => {
   const pipeline = pipelineOptions[params.id];
@@ -143,9 +153,5 @@ pipelineRouter.get("/:id", ({ params: { id } }, res) =>
 pipelineRouter.get("/", (req, res) =>
   res.send(Object.values(LocalDatabase.data))
 );
-
-pipelineRouter.post("/new", async ({ body: input, params }, res) => {
-
-});
 
 export default pipelineRouter;
