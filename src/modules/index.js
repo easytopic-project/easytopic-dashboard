@@ -62,18 +62,18 @@ modules.push({
     output_queue: "audio_extractor_out",
     input: [
       {
-        id: "input-placeholder",
+        id: "file",
         link: true,
         type: "file",
         required: true,
-        accept: ["image/*"],
+        accept: ["video/mp4"],
       },
     ],
     output: [
       {
-        id: "output-placeholder",
-        link: false,
-        type: "text",
+        id: "audio",
+        link: true,
+        type: "file",
       },
     ],
   });
@@ -88,18 +88,18 @@ modules.push({
     output_queue: "vad_out",
     input: [
       {
-        id: "input-placeholder",
+        id: "file",
         link: true,
         type: "file",
         required: true,
-        accept: ["image/*"],
+        accept: ["audio/*"],
       },
     ],
     output: [
       {
-        id: "output-placeholder",
-        link: false,
-        type: "text",
+        id: "vad-output",
+        link: true,
+        type: "file",
       },
     ],
   });
@@ -114,18 +114,18 @@ modules.push({
     output_queue: "asr_out",
     input: [
       {
-        id: "input-placeholder",
+        id: "file",
         link: true,
-        type: "file",
+        type: "text",
         required: true,
-        accept: ["image/*"],
+        accept: ["text/*"],
       },
     ],
     output: [
       {
-        id: "output-placeholder",
-        link: false,
-        type: "text",
+        id: "asr",
+        link: true,
+        type: "file",
       },
     ],
   });
@@ -140,18 +140,18 @@ modules.push({
     output_queue: "low_level_out",
     input: [
       {
-        id: "input-placeholder",
+        id: "file",
         link: true,
-        type: "file",
+        type: "text",
         required: true,
-        accept: ["image/*"],
+        accept: ["text/*"],
       },
     ],
     output: [
       {
-        id: "output-placeholder",
-        link: false,
-        type: "text",
+        id: "low-level-output",
+        link: true,
+        type: "file",
       },
     ],
   });
@@ -166,18 +166,24 @@ modules.push({
     output_queue: "topic_segmentation_out",
     input: [
       {
-        id: "input-placeholder",
+        id: "asr",
         link: true,
-        type: "file",
+        type: "text",
         required: true,
-        accept: ["image/*"],
+        accept: ["text/*"],
+      },{
+        id: "llf",
+        link: true,
+        type: "text",
+        required: true,
+        accept: ["text/*"],
       },
     ],
     output: [
       {
-        id: "output-placeholder",
-        link: false,
-        type: "text",
+        id: "topic-segmentation-output",
+        link: true,
+        type: "file",
       },
     ],
   });

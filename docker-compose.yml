@@ -52,25 +52,25 @@ services:
       INPUT_QUEUE_NAME: "ocr-in-test"
       OUTPUT_QUEUE_NAME: "ocr-out-test"
   
-  # worker-audio_extractor:
-  #   build: https://github.com/easytopic-project/audio-extractor.git
-  #   depends_on:
-  #     - rabbitmq
-  #   environment:
-  #     QUEUE_SERVER: "rabbitmq:5672"
-  #     FILES_SERVER: "files:3001"
-  #     INPUT_QUEUE_NAME: "audio_extractor_in"
-  #     OUTPUT_QUEUE_NAME: "audio_extractor_out"
+  worker-audio_extractor:
+    build: https://github.com/easytopic-project/audio-extractor.git
+    depends_on:
+      - rabbitmq
+    environment:
+      QUEUE_SERVER: "rabbitmq:5672"
+      FILES_SERVER: "files:3001"
+      INPUT_QUEUE_NAME: "audio_extractor_in"
+      OUTPUT_QUEUE_NAME: "audio_extractor_out"
 
-  # worker-vad:
-  #   build: https://github.com/easytopic-project/voice-activity-detector.git
-  #   depends_on:
-  #     - rabbitmq
-  #   environment:
-  #     QUEUE_SERVER: "rabbitmq:5672"
-  #     FILES_SERVER: "files:3001"
-  #     INPUT_QUEUE_NAME: "vad_in"
-  #     OUTPUT_QUEUE_NAME: "vad_out"
+  worker-vad:
+    build: https://github.com/easytopic-project/voice-activity-detector.git
+    depends_on:
+      - rabbitmq
+    environment:
+      QUEUE_SERVER: "rabbitmq:5672"
+      FILES_SERVER: "files:3001"
+      INPUT_QUEUE_NAME: "vad_in"
+      OUTPUT_QUEUE_NAME: "vad_out"
   
   # asr-server:
   #   build: https://github.com/easytopic-project/asr-server.git
