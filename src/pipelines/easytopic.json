@@ -99,7 +99,7 @@
         { "env": "TS_INPUT_QUEUE", "default": "topic_segmentation_in" },
         { "env": "TS_OUTPUT_QUEUE", "default": "topic_segmentation_out" }
       ],
-      "arguments": { "asr": "asr:0", "llf": "llf:0" },
+      "arguments": { "asr": "asr:asr", "llf": "llf:low-level-output" },
       "output": ["topic-segmentation-output"]
     }
   ]

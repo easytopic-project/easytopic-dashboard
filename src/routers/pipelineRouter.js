@@ -105,6 +105,14 @@ pipelineRouter.post("/new", async ({ body: pipeline }, res) => {
   pipeline.jobs.forEach((j) => {
     if (j.output instanceof Array)
       j.output = j.output.reduce((j, field) => ({ ...j, [field]: field }), {});
+    if (j.type && j.type == "aggregation")
+      j.jobs.forEach((s) => {
+        if (j.output instanceof Array)
+          j.output = j.output.reduce(
+            (j, field) => ({ ...j, [field]: field }),
+            {}
+          );
+      });
   });
 
   pipeline.jobs
