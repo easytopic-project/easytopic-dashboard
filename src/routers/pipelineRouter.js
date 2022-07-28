@@ -93,26 +93,27 @@ async function listenQueue(queue) {
 }
 
 pipelines.forEach((pipeline) =>
-pipeline.jobs
-.reduce((jobs, j) => jobs.concat(j.jobs || j), []) // Concat aggregation steps
-.forEach(async (job) => listenQueue(job.queues[1]))
+  pipeline.jobs
+    .reduce((jobs, j) => jobs.concat(j.jobs || j), []) // Concat aggregation steps
+    .forEach(async (job) => listenQueue(job.queues[1]))
 );
 
 pipelineRouter.post("/new", async ({ body: pipeline }, res) => {
   if (!pipeline) return res.status(404).send("no pipeline sent");
   if (!pipeline.id) return res.status(404).send("missing pipeline id");
-  
+
   pipeline.jobs.forEach((j) => {
     if (j.output instanceof Array)
       j.output = j.output.reduce((j, field) => ({ ...j, [field]: field }), {});
-    if (j.type && j.type == "aggregation")
+    if (j.type && j.type == "aggregation") {
       j.jobs.forEach((s) => {
-        if (j.output instanceof Array)
-          j.output = j.output.reduce(
-            (j, field) => ({ ...j, [field]: field }),
+        if (s.output instanceof Array)
+          s.output = s.output.reduce(
+            (s, field) => ({ ...s, [field]: field }),
             {}
           );
       });
+    }
   });
 
   pipeline.jobs

@@ -11,14 +11,15 @@ const pipelines = [
 // TODO: create instances that handle it
 pipelines.forEach(p => p.jobs.forEach(j => {
     if (j.output instanceof Array) j.output = j.output.reduce((j, field) => ({ ...j, [field]: field }), {});
-    if (j.type && j.type == "aggregation")
+    if (j.type && j.type == "aggregation") {    
       j.jobs.forEach((s) => {
-        if (j.output instanceof Array)
-          j.output = j.output.reduce(
-            (j, field) => ({ ...j, [field]: field }),
+        if (s.output instanceof Array)
+          s.output = s.output.reduce(
+            (s, field) => ({ ...s, [field]: field }),
             {}
           );
       });
+    }
 }));
 
 export default pipelines;
