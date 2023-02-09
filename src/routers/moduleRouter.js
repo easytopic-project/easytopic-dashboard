@@ -24,6 +24,7 @@ async function listenModuleConnection() {
     //const {props} = JSON.parse(msg.properties.toString());
     //console.log(`New Connection`);
     //console.log(msg);
+    ch.ack(msg);
   });
 }
 
