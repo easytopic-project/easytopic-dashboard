@@ -77,6 +77,8 @@ services:
     volumes:
       - /media/kaldi_models:/opt/test/models
       - ./sample_english_nnet2.yaml:/opt/test/models/sample_english_nnet2.yaml
+      - ./master.log:/opt/master.log
+      - ./worker.log:/opt/worker.log
     ports:
       - "9999:80"
   
@@ -120,9 +122,9 @@ services:
     # command: rabbitmq-plugins enable rabbitmq_event_exchange
     ports:
       - "4369:4369"
-      - "5672:5672"
+      - "3002:5672"
       - "25672:25672"
-      - "15672:15672"
+      - "3003:15672"
     volumes:
       - ./temp/rabbitmq:/var/lib/rabbitmq/mnesia/
       - ./enabled_plugins:/etc/rabbitmq/enabled_plugins
