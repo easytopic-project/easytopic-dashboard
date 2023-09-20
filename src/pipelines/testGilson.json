@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "id": "test-gilson",
+  "name": "Teste Gilson",
+  "description": "Test pipeline for Gilson's module",
+  "input": [
+    {
+      "id": "test",
+      "name": "XLSX File",
+      "description": "XLSX file with info to module",
+      "type": "file",
+      "required": true,
+      "accept": ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+    }
+  ],
+  "output": [
+    {
+      "id": "saida",
+      "type": "file",
+      "name": "Graph image",
+      "description": "Result graeph image"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "template-module",
+      "queues": ["template-module-in", "template-module-out"],
+      "arguments": {"file": "test"},
+      "output": {"saida": "echo-image"}
+    }
+  ]
+}

@@ -1,11 +1,13 @@
 import ocr from './ocr.json';
 import ocrTest from './ocrTest.json';
 import easytopic from './easytopic.json';
+import testGilson from './testGilson.json';
 
 const pipelines = [
     ocr,
     ocrTest,
-    easytopic
+    easytopic,
+    testGilson
 ];
 
 // TODO: create instances that handle it
