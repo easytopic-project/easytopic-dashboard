@@ -6,6 +6,7 @@ services:
     command: npm run dev
     volumes:
       - ./:/app
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - rabbitmq
     ports:
@@ -15,6 +16,7 @@ services:
       OCR_INPUT_QUEUE: "ocr-in"
       OCR_OUTPUT_QUEUE: "ocr-out"
       FILES_SERVER: "files:3001"
+      RMQ_API: "rabbitmq:15672"
   files:
     build: https://github.com/easytopic-project/node-files-microservice.git
     image: maxjf1/node-files-microservice:latest
@@ -49,13 +51,81 @@ services:
       FILES_SERVER: "files:3001"
       INPUT_QUEUE_NAME: "ocr-in-test"
       OUTPUT_QUEUE_NAME: "ocr-out-test"
+  
+  worker-audio_extractor:
+    build: https://github.com/easytopic-project/audio-extractor.git
+    depends_on:
+      - rabbitmq
+    environment:
+      QUEUE_SERVER: "rabbitmq:5672"
+      FILES_SERVER: "files:3001"
+      INPUT_QUEUE_NAME: "audio_extractor_in"
+      OUTPUT_QUEUE_NAME: "audio_extractor_out"
+
+  worker-vad:
+    build: https://github.com/easytopic-project/voice-activity-detector.git
+    depends_on:
+      - rabbitmq
+    environment:
+      QUEUE_SERVER: "rabbitmq:5672"
+      FILES_SERVER: "files:3001"
+      INPUT_QUEUE_NAME: "vad_in"
+      OUTPUT_QUEUE_NAME: "vad_out"
+  
+  asr-server:
+    build: https://github.com/easytopic-project/asr-server.git
+    volumes:
+      - /media/kaldi_models:/opt/test/models
+      - ./sample_english_nnet2.yaml:/opt/test/models/sample_english_nnet2.yaml
+      - ./master.log:/opt/master.log
+      - ./worker.log:/opt/worker.log
+    ports:
+      - "9999:80"
+  
+  worker-asr:
+    build: https://github.com/easytopic-project/automatic-speech-recognition.git
+    depends_on:
+      - rabbitmq
+      - asr-server
+    environment:
+      QUEUE_SERVER: "rabbitmq:5672"
+      FILES_SERVER: "files:3001"
+      INPUT_QUEUE_NAME: "asr_in"
+      OUTPUT_QUEUE_NAME: "asr_out"
+      ASR_SERVER: "asr-server"
+      GSTREAM_PORT: 80
+
+  worker-low-level-features:
+    build: https://github.com/easytopic-project/low-level-features.git
+    depends_on:
+      - rabbitmq
+    environment:
+      QUEUE_SERVER: "rabbitmq:5672"
+      FILES_SERVER: "files:3001"
+      INPUT_QUEUE_NAME: "low_level_in"
+      OUTPUT_QUEUE_NAME: "low_level_out"
+  
+  worker-topic-segmentation:
+    build: https://github.com/easytopic-project/topic-segmentation.git
+    depends_on:
+      - rabbitmq
+    environment:
+      QUEUE_SERVER: "rabbitmq:5672"
+      FILES_SERVER: "files:3001"
+      INPUT_QUEUE_NAME: "topic_segmentation_in"
+      OUTPUT_QUEUE_NAME: "topic_segmentation_out"
+    volumes:
+      - /media/word2vec:/word2vec
 
   rabbitmq:
     image: rabbitmq:3-management
+    # command: rabbitmq-plugins enable rabbitmq_event_exchange
     ports:
       - "4369:4369"
-      - "5672:5672"
+      - "3002:5672"
       - "25672:25672"
-      - "15672:15672"
+      - "3003:15672"
     volumes:
       - ./temp/rabbitmq:/var/lib/rabbitmq/mnesia/
+      - ./enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf

@@ -6,6 +6,7 @@ import {
     PORT,
 } from './env';
 import pipelineRouter from './routers/pipelineRouter';
+import moduleRouter from './routers/moduleRouter';
 
 const app = express();
 app.disable('x-powered-by');
@@ -13,6 +14,8 @@ app.use(cors());
 app.use(jsonBody());
 
 app.use('/pipeline', pipelineRouter);
+
+app.use('/module', moduleRouter);
 
 app.all('*', (req, res) => res.status(404).json('Not found'));
 
