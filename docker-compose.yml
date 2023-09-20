@@ -128,3 +128,4 @@ services:
     volumes:
       - ./temp/rabbitmq:/var/lib/rabbitmq/mnesia/
       - ./enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
