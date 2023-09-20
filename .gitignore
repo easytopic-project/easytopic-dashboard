@@ -3,3 +3,4 @@ temp/
 .vscode
 dist/
 temp/
+.log
