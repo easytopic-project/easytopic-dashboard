@@ -3,4 +3,4 @@ temp/
 .vscode
 dist/
 temp/
-.log
+*.log
