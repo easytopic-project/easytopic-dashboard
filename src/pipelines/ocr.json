@@ -25,7 +25,7 @@
       "name": "Language",
       "description": "The language",
       "type": "select",
-      "options": {"eng": "English", "ptbr": "Brazilian portugueze"},
+      "options": { "eng": "English", "ptbr": "Brazilian portugueze" },
       "required": true
     }
   ],
@@ -45,31 +45,22 @@
       "jobs": [
         {
           "id": "ocr-service",
-          "queues": [
-            {"env": "OCR_INPUT_QUEUE", "default": "ocr-in"},
-            {"env": "OCR_OUTPUT_QUEUE", "default": "ocr-out"}
-          ],
-          "arguments": {"file": "image"},
+          "queues": ["ocr-in", "ocr-out"],
+          "arguments": { "file": "image" },
           "output": ["ocr"]
         },
         {
           "id": "ocr-service-copy",
-          "queues": [
-            {"env": "OCR_INPUT_QUEUE", "default": "ocr-in"},
-            {"env": "OCR_OUTPUT_QUEUE", "default": "ocr-out"}
-          ],
-          "arguments": {"file": "image-alt"},
+          "queues": ["ocr-in", "ocr-out"],
+          "arguments": { "file": "image-alt" },
           "output": ["ocr"]
         }
       ]
     },
     {
       "id": "ocr-final",
-      "queues": [
-        {"env": "OCR_INPUT_QUEUE", "default": "ocr-in"},
-        {"env": "OCR_OUTPUT_QUEUE", "default": "ocr-out"}
-      ],
-      "arguments": {"file": "image"},
+      "queues": ["ocr-in", "ocr-out"],
+      "arguments": { "file": "image" },
       "output": ["ocr"]
     }
   ]

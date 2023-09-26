@@ -3,7 +3,7 @@ import ocrTest from './ocrTest.json';
 import easytopic from './easytopic.json';
 import testGilson from './testGilson.json';
 
-const pipelines = [
+const pipelines2 = [
     ocr,
     ocrTest,
     easytopic,
@@ -11,7 +11,7 @@ const pipelines = [
 ];
 
 // TODO: create instances that handle it
-pipelines.forEach(p => p.jobs.forEach(j => {
+pipelines2.forEach(p => p.jobs.forEach(j => {
     if (j.output instanceof Array) j.output = j.output.reduce((j, field) => ({ ...j, [field]: field }), {});
     if (j.type && j.type == "aggregation") {    
       j.jobs.forEach((s) => {
@@ -24,4 +24,4 @@ pipelines.forEach(p => p.jobs.forEach(j => {
     }
 }));
 
-export default pipelines;
+export default pipelines2;
