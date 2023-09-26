@@ -27,6 +27,7 @@ services:
       OCR_INPUT_QUEUE: "ocr-in"
       OCR_OUTPUT_QUEUE: "ocr-out"
       FILES_SERVER: "files:3001"
+      MONGO_SERVER: "mongodb://mongo:27017/m2p"
       RMQ_API: "rabbitmq:15672"
     restart: unless-stopped
   files:
@@ -143,4 +144,7 @@ services:
       - ./enabled_plugins:/etc/rabbitmq/enabled_plugins
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     restart: unless-stopped
-    
+  mongo:
+    image: mongo:6-jammy
+    ports:
+      - '27017:27017'
