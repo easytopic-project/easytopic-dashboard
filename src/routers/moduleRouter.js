@@ -6,9 +6,12 @@ import { getChannel } from "../lib/queueConnection";
 import Docker from "dockerode";
 import { all } from "express/lib/application";
 import { FILES_SERVER } from "../env";
-import modules from "../modules";
+import MongoDatabase from "../lib/MongoDatabase";
 
-const defaultModules = modules.map((module) => module.id);
+async function getDefaultModules() {
+  const modules = await MongoDatabase.getModules({default: true});
+  return modules.map((module) => module.id);
+}
 
 const moduleRouter = new Router();
 
@@ -76,6 +79,7 @@ async function getImages() {
 moduleRouter.get("/", async (req, res) => {
   //const data = await getAvaiableModules();
   const containers = await getContainers();
+  const modules = await MongoDatabase.getModules();
   const modulesInfo = modules.map(async (module) => {
     const app = containers.find(
       (container) =>
@@ -105,6 +109,7 @@ moduleRouter.get("/images", async (req, res) => {
 });
 
 moduleRouter.post("/stop", async ({ body: { id } }, res) => {
+  const defaultModules = await getDefaultModules();
   const container = defaultModules.includes(id)
     ? docker.getContainer("easytopic-dashboard-api_" + id + "_1")
     : docker.getContainer(id + "-container");
@@ -113,6 +118,7 @@ moduleRouter.post("/stop", async ({ body: { id } }, res) => {
 });
 
 moduleRouter.post("/start", async ({ body: { id } }, res) => {
+  const defaultModules = await getDefaultModules();
   const container = defaultModules.includes(id)
     ? docker.getContainer("easytopic-dashboard-api_" + id + "_1")
     : docker.getContainer(id + "-container");
@@ -130,7 +136,7 @@ moduleRouter.post("/add", async ({ body: { build, configFile } }, res) => {
   );
   const config = fileRes.data;
 
-  modules.push(config);
+  await MongoDatabase.addModule(config);
 
   console.log(`Build from client: ${build}`);
 

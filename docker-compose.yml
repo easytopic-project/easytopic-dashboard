@@ -147,4 +147,4 @@ services:
   mongo:
     image: mongo:6-jammy
     ports:
-      - '27017:27017'
+      - '3005:27017'

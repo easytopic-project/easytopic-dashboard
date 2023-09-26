@@ -54,6 +54,7 @@ const ModuleSchema = mongoose.Schema({
   email: String,
   input_queue: String,
   output_queue: String,
+  default: Boolean,
   input: [
     {
       id: String,
@@ -73,7 +74,7 @@ const ModuleSchema = mongoose.Schema({
 });
 
 const JobSchema = mongoose.Schema({
-  id: String,
+  id: Number,
   type: String,
   version: String,
   status: String,
@@ -85,19 +86,46 @@ const JobSchema = mongoose.Schema({
   jobStatus: Object,
 });
 
+const CounterSchema = mongoose.Schema({
+  id: String,
+  seq: Number,
+});
+
 const Pipeline = mongoose.model("pipeline", PipelineSchema);
 const Module = mongoose.model("module", ModuleSchema);
 const Job = mongoose.model("job", JobSchema);
+const Counter = mongoose.model("counter", CounterSchema);
 
 class MongoDatabase {
   static uri = process.env.MONGO_SERVER || "mongodb://localhost:27017/m2p";
   static connection = null;
 
   static async connect() {
-    if (!this.connection) {
+    if (this.connection) return this.connection;
+    try {
       this.connection = await mongoose.connect(this.uri);
       console.log("Connected to DB");
+      return this.connection;
+    } catch (err) {
+      this.connection = null;
+      console.warn(`Connection to ${uri} failed. retrying in 3 seconds...`);
+      setTimeout(generateConnection, 3000);
     }
+  }
+
+  static async getSeq(collectionId) {
+    let doc = await Counter.findOneAndUpdate(
+      { id: collectionId },
+      { $inc: { seq: 1 } },
+      { new: true }
+    ).lean();
+
+    if (!doc) {
+      const newVal = new Counter({ id: collectionId, seq: 1 });
+      await newVal.save();
+      return 1;
+    }
+    return doc.seq;
   }
 
   static async getPipelines() {
@@ -111,8 +139,8 @@ class MongoDatabase {
     return savedPipe === newPipeInstance;
   }
 
-  static async getModules() {
-    let modules = await Module.find({}).lean();
+  static async getModules(filter = {}) {
+    let modules = await Module.find(filter).lean();
     return modules;
   }
 
@@ -124,44 +152,38 @@ class MongoDatabase {
 
   static async postItem(newJob) {
     //TODO rename function to addJob
-    let newJobInstance = new Job(newJob);
+    let newJobInstance = new Job({ ...newJob, id: await this.getSeq("job") });
     let savedJob = await newJobInstance.save();
-    newJob["id"] = savedJob["_id"]
-    newJob["_id"] = savedJob["_id"]
-    return newJob;
+    return savedJob;
   }
 
   static async getItem(id) {
     //TODO rename function to getJob
-    let job = await Job.findById(id).lean();
-    job = { ...job, id: job["_id"] };
+    let job = await Job.findOne({ id: id }).lean();
     return job;
   }
 
   static async getAllItems() {
     //TODO rename function to getAllJobs
     let jobs = await Job.find({}).lean();
-    jobs = jobs.map((m) => ({ ...m, id: m["_id"]}));
     return jobs;
   }
 
   static async updateItem(id, data) {
     //TODO rename function to updateJob
-    let updatedJob = await Job.findByIdAndUpdate(id, data);
-    let job  = await Job.findById(id).lean();
-    job = { ...job, id: job["_id"] };
-    return job;
+    let updatedJob = await Job.findOneAndUpdate({ id: id }, data).lean();
+    return updatedJob;
   }
 
   static async populateDB() {
-    // for (const pipeline of pipelines) {
-    //   if (!(await this.addPipeline(pipeline))) return false;
-    // }
-
-    for (const module of modules) {
-      if (!(await this.addModule(module))) return false;
+    this.connect();
+    for (const pipeline of pipelines) {
+      if (!(await this.addPipeline(pipeline))) return false;
     }
 
+    for (const module of modules) {
+      if (!(await this.addModule({ ...module, default: true }))) return false;
+    }
     return true;
   }
 }
