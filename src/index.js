@@ -7,7 +7,9 @@ import {
 } from './env';
 import pipelineRouter from './routers/pipelineRouter';
 import moduleRouter from './routers/moduleRouter';
+import MongoDatabase from './lib/MongoDatabase';
 
+MongoDatabase.connect();
 const app = express();
 app.disable('x-powered-by');
 app.use(cors());
