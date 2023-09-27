@@ -1,7 +1,9 @@
 version: "3.3"
 services:
   react-front:
-    build: ../easytopic-dashboard-react/
+    build: 
+      context: ../easytopic-dashboard-react/
+      network: "host"
     image: maxjf1/easytopic-dashboard-react:latest
     command: npm start
     volumes:
@@ -12,7 +14,9 @@ services:
       - 3010:3000
     restart: unless-stopped
   dashboard:
-    build: .
+    build: 
+      context: .
+      network: "host"
     image: maxjf1/easytopic-dashboard-api:latest
     command: npm run dev
     volumes:
@@ -31,7 +35,9 @@ services:
       RMQ_API: "rabbitmq:15672"
     restart: unless-stopped
   files:
-    build: https://github.com/easytopic-project/node-files-microservice.git
+    build: 
+      context: https://github.com/easytopic-project/node-files-microservice.git
+      network: "host"
     image: maxjf1/node-files-microservice:latest
     ports:
       - 3001:3001
@@ -41,7 +47,9 @@ services:
       PORT: 3001
     restart: unless-stopped
   ocr:
-    build: https://github.com/maxjf1/node-ocr-server.git
+    build: 
+      context: https://github.com/maxjf1/node-ocr-server.git
+      network: "host"
     image: maxjf1/node-ocr-server:latest
     depends_on:
       - rabbitmq
@@ -54,7 +62,9 @@ services:
       OUTPUT_QUEUE_NAME: "ocr-out"
     restart: unless-stopped
   ocr-test:
-    build: https://github.com/maxjf1/node-ocr-server.git
+    build: 
+      context: https://github.com/maxjf1/node-ocr-server.git
+      network: "host"
     image: maxjf1/node-ocr-server:latest
     depends_on:
       - rabbitmq
@@ -67,7 +77,9 @@ services:
       OUTPUT_QUEUE_NAME: "ocr-out-test"
     restart: unless-stopped
   worker-audio_extractor:
-    build: https://github.com/easytopic-project/audio-extractor.git
+    build: 
+      context: https://github.com/easytopic-project/audio-extractor.git
+      network: "host"
     depends_on:
       - rabbitmq
     environment:
@@ -77,7 +89,9 @@ services:
       OUTPUT_QUEUE_NAME: "audio_extractor_out"
     restart: unless-stopped
   worker-vad:
-    build: https://github.com/easytopic-project/voice-activity-detector.git
+    build: 
+      context: https://github.com/easytopic-project/voice-activity-detector.git
+      network: "host"
     depends_on:
       - rabbitmq
     environment:
@@ -87,17 +101,19 @@ services:
       OUTPUT_QUEUE_NAME: "vad_out"
     restart: unless-stopped
   asr-server:
-    build: https://github.com/easytopic-project/asr-server.git
+    build: 
+      context: https://github.com/easytopic-project/asr-server.git
+      network: "host"
     volumes:
       - /media/kaldi_models:/opt/test/models
       - ./sample_english_nnet2.yaml:/opt/test/models/sample_english_nnet2.yaml
-      - ./master.log:/opt/master.log
-      - ./worker.log:/opt/worker.log
     ports:
       - "9999:80"
     restart: unless-stopped
   worker-asr:
-    build: https://github.com/easytopic-project/automatic-speech-recognition.git
+    build: 
+      context: https://github.com/easytopic-project/automatic-speech-recognition.git
+      network: "host"
     depends_on:
       - rabbitmq
       - asr-server
@@ -110,7 +126,9 @@ services:
       GSTREAM_PORT: 80
     restart: unless-stopped
   worker-low-level-features:
-    build: https://github.com/easytopic-project/low-level-features.git
+    build: 
+      context: https://github.com/easytopic-project/low-level-features.git
+      network: "host"
     depends_on:
       - rabbitmq
     environment:
@@ -120,7 +138,9 @@ services:
       OUTPUT_QUEUE_NAME: "low_level_out"
     restart: unless-stopped
   worker-topic-segmentation:
-    build: https://github.com/easytopic-project/topic-segmentation.git
+    build: 
+      context: https://github.com/easytopic-project/topic-segmentation.git
+      network: "host"
     depends_on:
       - rabbitmq
     environment:
@@ -145,6 +165,7 @@ services:
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     restart: unless-stopped
   mongo:
-    image: mongo:6-jammy
+    image: mongo:4
     ports:
       - '3005:27017'
+    restart: unless-stopped
