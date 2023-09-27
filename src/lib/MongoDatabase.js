@@ -103,13 +103,14 @@ class MongoDatabase {
   static async connect() {
     if (this.connection) return this.connection;
     try {
-      this.connection = await mongoose.connect(this.uri);
+      this.connection = await mongoose.connect(MongoDatabase.uri);
       console.log("Connected to DB");
       return this.connection;
     } catch (err) {
       this.connection = null;
-      console.warn(`Connection to ${uri} failed. retrying in 3 seconds...`);
-      setTimeout(generateConnection, 3000);
+      console.warn(`Connection to ${MongoDatabase.uri} failed. retrying in 3 seconds...`);
+      console.log(err);
+      setTimeout(MongoDatabase.connect, 3000);
     }
   }
 
