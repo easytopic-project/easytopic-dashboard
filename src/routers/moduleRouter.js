@@ -41,7 +41,7 @@ async function getAvaiableModules() {
     auth: authParams,
   });
 
-  const modules = res.data.map(({ client_properties, connected_at, user }) => ({
+  let modules = res.data.map(({ client_properties, connected_at, user }) => ({
     //information: client_properties.information,
     platform: client_properties.platform,
     //product: client_properties.product,
@@ -50,6 +50,10 @@ async function getAvaiableModules() {
     connected_at: connected_at,
     ...client_properties.module_specs,
   }));
+
+  
+
+  modules = modules.filter((module) => module.id);
 
   return modules;
 }
@@ -75,6 +79,8 @@ async function getImages() {
   });
   return data;
 }
+
+moduleRouter.get("/external", async (req,res) => {res.send(await getAvaiableModules())});
 
 moduleRouter.get("/", async (req, res) => {
   //const data = await getAvaiableModules();
@@ -194,7 +200,7 @@ moduleRouter.post("/add", async ({ body: { build, configFile } }, res) => {
 
   docker.buildImage(
     null,
-    { t: config.id + "-image", remote: build },
+    { t: config.id + "-image", remote: build, networkmode: "host" },
     function (err, stream) {
       if (err) {
         console.log(err);
