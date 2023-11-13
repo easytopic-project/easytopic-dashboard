@@ -82,6 +82,23 @@ async function getImages() {
 
 moduleRouter.get("/external", async (req,res) => {res.send(await getAvaiableModules())});
 
+/**
+ * @openapi
+ * /module:
+ *  get:
+ *    tags:
+ *      - Modules
+ *    summary: Get avaiable modules
+ *    responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/CreateNewPipeline'
+ *      400:
+ *        description: Bad request
+ */
 moduleRouter.get("/", async (req, res) => {
   //const data = await getAvaiableModules();
   const containers = await getContainers();
@@ -114,6 +131,25 @@ moduleRouter.get("/images", async (req, res) => {
   res.send(data);
 });
 
+/**
+ * @openapi
+ * /module/stop:
+ *  post:
+ *    tags:
+ *      - Modules
+ *    summary: Stops an existing module in host machine
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/CreateNewPipeline'
+ *    responses:
+ *      200:
+ *        description: Success in stopping module
+ *      400:
+ *        description: Bad request
+ */
 moduleRouter.post("/stop", async ({ body: { id } }, res) => {
   const defaultModules = await getDefaultModules();
   const container = defaultModules.includes(id)
@@ -123,6 +159,25 @@ moduleRouter.post("/stop", async ({ body: { id } }, res) => {
   res.send("container" + id + "stopped");
 });
 
+/**
+ * @openapi
+ * /module/start:
+ *  post:
+ *    tags:
+ *      - Modules
+ *    summary: Starts an existing module in host machine
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/CreateNewPipeline'
+ *    responses:
+ *      200:
+ *        description: Success in adding module
+ *      400:
+ *        description: Bad request
+ */
 moduleRouter.post("/start", async ({ body: { id } }, res) => {
   const defaultModules = await getDefaultModules();
   const container = defaultModules.includes(id)
@@ -132,6 +187,25 @@ moduleRouter.post("/start", async ({ body: { id } }, res) => {
   res.send("container" + id + "started");
 });
 
+/**
+ * @openapi
+ * /module/add:
+ *  post:
+ *    tags:
+ *      - Modules
+ *    summary: Builds and adds a new container in host machine
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/CreateNewPipeline'
+ *    responses:
+ *      200:
+ *        description: Success in adding module
+ *      400:
+ *        description: Bad request
+ */
 moduleRouter.post("/add", async ({ body: { build, configFile } }, res) => {
   if (!build || !configFile) {
     res.sendStatus(401);

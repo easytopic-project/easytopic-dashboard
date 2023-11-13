@@ -102,9 +102,29 @@ let pipelines = MongoDatabase.getPipelines().then((pipelines) =>{
   )}, (err) => console.log(err)
 );
 
+/**
+ * @openapi
+ * /pipeline/new:
+ *  post:
+ *    tags:
+ *      - Pipelines
+ *    summary: Creates a new pipeline
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/CreateNewPipeline'
+ *    responses:
+ *      200:
+ *        description: Success in creating pipeline
+ *      400:
+ *        description: Bad request
+ */
 pipelineRouter.post("/new", async ({ body: pipeline }, res) => {
   if (!pipeline) return res.status(404).send("no pipeline sent");
   if (!pipeline.id) return res.status(404).send("missing pipeline id");
+  if (!pipeline.jobs) return res.status(400).send("missing jobs");
 
   pipeline.jobs.forEach((j) => {
     if (j.output instanceof Array)
@@ -129,6 +149,34 @@ pipelineRouter.post("/new", async ({ body: pipeline }, res) => {
   res.send(`pipeline of id '${pipeline.id}' created`);
 });
 
+/**
+ * @openapi
+ * '/pipeline/{id}':
+ *  post:
+ *    tags:
+ *      - Jobs
+ *    summary: Starts processing a job
+ *    parameters:
+ *      - name: id
+ *        in: path
+ *        description: Id of an existing pipeline
+ *        required: true
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/CreateNewPipeline'
+ *    responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/CreateNewPipeline'
+ *      404:
+ *        description: Pipeline with given id not found
+ */
 pipelineRouter.post("/:id", async ({ body: input, params }, res) => {
   pipelines = await MongoDatabase.getPipelines();
   const pipeline = getPipelineOptions(pipelines)[params.id];
@@ -163,15 +211,71 @@ pipelineRouter.post("/:id", async ({ body: input, params }, res) => {
   res.send(job);
 });
 
+/**
+ * @openapi
+ * /pipeline/options:
+ *  get:
+ *    tags:
+ *      - Pipelines
+ *    summary: Get avaiable pipelines options
+ *    responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/CreateNewPipeline'
+ *      400:
+ *        description: Bad request
+ */
 pipelineRouter.get("/options", async (req, res) => {
   pipelines = await MongoDatabase.getPipelines();
   res.send(pipelines.map(({ pipeline, ...info }) => info));
 });
 
+/**
+ * @openapi
+ * '/pipeline/{id}':
+ *  get:
+ *    tags:
+ *      - Jobs
+ *    summary: Get status of the specific executed job
+ *    parameters:
+ *      - name: id
+ *        in: path
+ *        description: Id of an iniciated job
+ *        required: true
+ *    responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/CreateNewPipeline'
+ *      400:
+ *        description: Bad request
+ */
 pipelineRouter.get("/:id", async ({ params: { id } }, res) => {
   res.send(await MongoDatabase.getItem(id) || 404)}
 );
 
+/**
+ * @openapi
+ * '/pipeline':
+ *  get:
+ *    tags:
+ *      - Jobs
+ *    summary: Get status of all the executed jobs
+ *    responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/CreateNewPipeline'
+ *      400:
+ *        description: Bad request
+ */
 pipelineRouter.get("/", async (req, res) =>
   res.send(Object.values(await MongoDatabase.getAllItems()))
 );

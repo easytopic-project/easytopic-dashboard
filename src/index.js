@@ -8,6 +8,7 @@ import {
 import pipelineRouter from './routers/pipelineRouter';
 import moduleRouter from './routers/moduleRouter';
 import MongoDatabase from './lib/MongoDatabase';
+import openapiDocs from './lib/swagger';
 
 MongoDatabase.connect();
 const app = express();
@@ -18,6 +19,8 @@ app.use(jsonBody());
 app.use('/api/pipeline', pipelineRouter);
 
 app.use('/api/module', moduleRouter);
+
+openapiDocs(app)
 
 app.all('/api/*', (req, res) => res.status(404).json('Not found'));
 
